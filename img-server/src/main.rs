@@ -9,7 +9,13 @@ use send_it::{reader::VarReader};
 fn main() {
     // simple tcp server:
     info("Starting TCP listener...");
-    let listener = TcpListener::bind("0.0.0.0:3333").expect("Failed to start tcp listener!");
+    let listener = match TcpListener::bind("0.0.0.0:3333") {
+        Ok(l) => l,
+        Err(e) => {
+            error_with_err("Failed to bind address 0.0.0.0:3333 to listener", e);
+            return;
+        }
+    };
     highlighted_info("Listnening on port", "3333");
     
     // loop through incoming connections
