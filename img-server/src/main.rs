@@ -1,7 +1,10 @@
 use std::{net::TcpListener, thread};
 
+use std::io::Cursor;
+use image::io::Reader as ImageReader;
+
 use img_common::{info, highlighted_info, error_with_err, error, conn_log};
-use send_it::{reader::VarReader, Segment};
+use send_it::{reader::VarReader};
 
 fn main() {
     // simple tcp server:
@@ -29,7 +32,21 @@ fn main() {
             let mut reader = VarReader::new(&mut stream);
             
             while let Ok(read) = reader.read_data() {
-                conn_log(ip.to_string(), format!("Read from client: {:?}", Segment::to_readable(read)));
+                // handle incoming data here
+
+                let name_full = read.first().unwrap().to_string();
+                let name = name_full.replace(".png", "");
+                let timestamp = read.get(1).unwrap();
+                let content = read.last().unwrap();
+
+                conn_log(ip.to_string(), format!("File name {} taken at {} recieved!", name, timestamp));
+
+                // make the file and write the content to it
+                let path = format!("{}_copy.png", name);
+                let img = ImageReader::new(Cursor::new(content.as_ref()))
+                .with_guessed_format().expect("Failed to write image").decode().expect("Failed to decode!");
+
+                img.save(&path).expect("Failed to save new file!");
             }
             
             conn_log(ip.to_string(), "Connection closed.");

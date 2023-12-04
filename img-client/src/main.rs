@@ -1,3 +1,4 @@
+use std::path::Path;
 use std::{net::TcpStream, env};
 use std::io::Cursor;
 use image::io::Reader as ImageReader;
@@ -16,9 +17,11 @@ fn main() {
         return;
     }
     // get test_image.png
-    let filename = args.join(" ");
-    println!("Filename: {}", filename);
-    let img = ImageReader::open(&filename).unwrap().decode().unwrap();
+    let raw_path = args.join(" ");
+    let path = Path::new(&raw_path);
+    let filename = path.file_name().expect("Failed to get file name!");
+    println!("Filename: {}", filename.to_string_lossy());
+    let img = ImageReader::open(path).unwrap().decode().unwrap();
     let mut bytes: Vec<u8> = Vec::new();
     img.write_to(&mut Cursor::new(&mut bytes), image::ImageOutputFormat::Png).expect("Failed to write image file!");
 
@@ -37,7 +40,7 @@ fn main() {
     // create the writer
     let mut writer = VarWriter::default();
     
-    writer.add_string(filename);
+    writer.add_string(filename.to_string_lossy());
     writer.add_string(format!("{}", timestamp.format("%Y-%m-%d %H:%M:%S")));
     writer.add_raw(&bytes[..]);
     

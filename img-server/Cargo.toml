@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 send-it = "0.1.4"
 chrono = "*"
+image = "*"
 
 [dependencies.img-common]
 path = "../img-common"
