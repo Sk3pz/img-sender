@@ -36,7 +36,6 @@ fn main() {
             
             // read data from the stream
             while let Ok(read) = reader.read_data() {
-
                 // get each expected segment
                 let name_full = read.first().unwrap().to_string();
                 let name = name_full.replace(".png", "");
@@ -50,7 +49,7 @@ fn main() {
                 let path = format!("{}_copy.png", name);
                 let img = ImageReader::new(Cursor::new(content.as_ref()))
                 .with_guessed_format().expect("Failed to write image").decode().expect("Failed to decode!");
-
+                
                 // save the image copy
                 img.save(&path).expect("Failed to save new file!");
             }
