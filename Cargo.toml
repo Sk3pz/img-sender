@@ -1,0 +1,6 @@
+[workspace]
+
+members = [
+    "img-client", "img-common",
+    "img-server",
+]
